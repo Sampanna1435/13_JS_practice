@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="wrapper">
+        <h1>申し込みフォーム</h1>
+        <form>
+            <label for="yourN">氏名：<input type="text" value="十来 電人" id="yourN"></label>
+            <label for="schoolN">学校名：<input type="text" value="トライデントコンピュータ専門学校" id="schoolN"></label>
+            <label for="telN">電話番号：<input type="tel" value="052-581-0581" id="telN"></label>
+            <button type="button">送信</button>
+        </form>
+        <h2>結果</h2>
+        <div class="result"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script>
+        //ここに書いてください。
+        var button = document.querySelector('button');
+        var resultContainer = document.querySelector('.result');
+        var inputs = document.querySelectorAll('form input');
+        button.addEventListener('click', function () {
+            var ul = document.createElement('ul');
+            inputs.forEach(function (input) {
+                var li = document.createElement('li');
+                li.textContent = input.value;
+                ul.appendChild(li);
+            });
+            resultContainer.innerHTML = ''; // 既存の内容をクリア
+            resultContainer.appendChild(ul);
+        });
+
+    </script>
+</body>
+
+</html>
+</body>
+
+</html>
