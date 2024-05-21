@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSクイズNEO⑤</title>
+</head>
+
+<body>
+    <h1 class="getRank">ビジュアル女王</h1>
+    <div class="result"></div>
+
+    <h1 class="getMember">I-LAND</h1>
+    <ul class="member"></ul>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script>
+        const iland2 = {
+            "I-LAND": ["キム・スジョン", "ナム・ユジュ", "リンリン", "マイ", "パン・ジミン", "ユ・サラン", "ユイ", "ユン・ジユン", "チョン・セビ", "チェ・ジョンウン", "ココ", "フウコ"],
+            "GROUND": ["キム・ギュリ", "キム・ミンソル", "キム・チェウン", "パク・イェウン", "ソン・ジュウォン", "オム・ジウォン", "オ・ユナ", "チェ・ソウル",],
+            "LOSE": ["カン・ジウォン", "キム・ウンチェ", "ナナ", "ユイコ"]
+        }
+    </script>
+    <script>
+        //こちらのコードのみを送ってください。
+        $(document).ready(function () {
+            $(".getRank").click(function () {
+                const name = iland2["I-LAND"].find(member => member === "マイ");
+                $(".result").text(`${name}`);
+            });
+        });
+        $(document).ready(function () {
+            $(".getMember").click(function () {
+                const ilandMembers = iland2["I-LAND"];
+                const groundMembers = iland2["GROUND"];
+                $(".member").empty();
+                ilandMembers.forEach(member => {
+                    $(".member").append(`<li>${member}</li>`);
+                });
+                groundMembers.forEach(member => {
+                    $(".member").append(`<li>${member}</li>`);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

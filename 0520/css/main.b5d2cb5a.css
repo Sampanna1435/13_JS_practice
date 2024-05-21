@@ -1,0 +1,29 @@
+@import url(https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap);
+@import url(https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Roboto+Condensed:wght@300;400;700&display=swap);
+
+body,
+html {
+    box-sizing: border-box
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: linear-gradient(80deg, #000428, #004e92);
+    font-family: Poppins, Arial, sans-serif !important;
+    margin: 0;
+    min-height: 100vh;
+    padding: 2rem
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, Courier New, monospace
+}
+
+@media screen and (max-width: 600px) {
+    body {
+        padding: 0
+    }
+}
+
+/*# sourceMappingURL=main.b5d2cb5a.css.map*/

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css"
+        href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="../image/logo.png">
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: gray;
+            font-family: 'Raleway', sans-serif;
+            font-size: 120%;
+            opacity: 0.8;
+            background-image: url('https://source.unsplash.com/1600x900/?landscape');
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            color: white;
+        }
+
+        .content {
+            background: black;
+            padding: 2em;
+            border-radius: 25px;
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+
+        .search {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        button {
+            margin: 0.5em;
+            border-radius: 50%;
+            border: none;
+            outline: none;
+            background: #7c7c7c8b;
+            cursor: pointer;
+            font-size: 27px;
+            padding: 0.3em 0.4em;
+        }
+
+        input.search-bar {
+            border: none;
+            border-radius: 25px;
+            outline: none;
+            margin: 0;
+            padding: 0.6em 1em;
+            background: #7c7c7c2b;
+            color: white;
+            font-size: 120%;
+            font-family: 'Raleway', sans-serif;
+            width: calc(100% - 100px);
+        }
+
+        button:hover {
+            background: #7c7c7c6b;
+        }
+
+        h1.temperature {
+            margin: 0;
+            margin-bottom: 0.4em;
+        }
+
+        .flex {
+            display: flex;
+            align-items: center;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+
+        .description {
+            text-transform: capitalize;
+            margin-left: 8px;
+        }
+
+        .weather.loading {
+            visibility: hidden;
+            max-height: 20px;
+            position: relative;
+        }
+
+        .weather.loading:after {
+            visibility: visible;
+            content: "Loading...";
+            color: white;
+            position: absolute;
+            top: 0;
+            left: 20px;
+        }
+
+        .forecast {
+            margin-top: 1em;
+        }
+
+        .forecast .flex {
+            justify-content: space-between;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                font-size: 100%;
+                background-size: cover;
+                height: auto;
+                padding: 1em;
+                background-image: url('https://source.unsplash.com/1600x900/?landscape');
+                background-size: 400% auto;
+            }
+
+            .content {
+                padding: 1em;
+                border-radius: 15px;
+            }
+
+            button {
+                font-size: 20px;
+                padding: 0.3em 0.5em;
+            }
+
+            input.search-bar {
+                font-size: 100%;
+                padding: 0.5em 1em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <div class="search">
+            <input type="text" class="search-bar" id="search-input" placeholder="検索">
+            <button type="button" class="btn btn-dark">
+                <i class="fa fa-search" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="weather loading" style="font-family: 'Noto Sans JP', sans-serif;">
+            <h2 class="city">コイムバトールの天気</h2>
+            <h1 class="temperature">31°C</h1>
+            <div class="flex">
+                <img src="https://openweathermap.org/img/wn/04n.png" alt="" class="icon" />
+                <div class="description"></div>
+            </div>
+            <div class="humidity"></div>
+            <div class="wind"></div>
+        </div>
+        <div class="forecast" id="tomorrow-forecast">
+            <h2>明日の天気</h2>
+            <div class="flex">
+                <img src="" alt="" class="forecast-icon" />
+                <div class="forecast-temp">-</div>
+                <div class="forecast-description">-</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cityElement = document.querySelector(".city");
+        const iconElement = document.querySelector(".icon");
+        const descriptionElement = document.querySelector(".description");
+        const temperatureElement = document.querySelector(".temperature");
+        const humidityElement = document.querySelector(".humidity");
+        const windElement = document.querySelector(".wind");
+        const weatherElement = document.querySelector(".weather");
+        const searchInputText = document.getElementById("search-input");
+        const forecastElements = document.querySelectorAll(".forecast");
+
+        const weather = {};
+        const apiKey = "58782a0db956cc6008e9fce3c0fce3a4";
+
+        if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(findUserLocation);
+        }
+
+        function findUserLocation(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            getWeatherByLocation(latitude, longitude);
+        }
+
+        function getWeatherByLocation(latitude, longitude) {
+            const userLocationApi = "https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&units=metric&appid=" + apiKey;
+            const forecastApi = "https://api.openweathermap.org/data/2.5/forecast?lat=" + latitude + "&lon=" + longitude + "&units=metric&appid=" + apiKey;
+
+            Promise.all([
+                fetch(userLocationApi).then(response => response.json()),
+                fetch(forecastApi).then(response => response.json())
+            ]).then(([weatherData, forecastData]) => {
+                displayWeather(weatherData);
+                displayForecast(forecastData);
+            }).catch(error => {
+                console.error("Error fetching weather data:", error);
+            });
+        }
+
+        function getWeather(city) {
+            const byCityApi = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&appid=" + apiKey;
+            fetch(byCityApi)
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    alert("Sorry, no weather is found");
+                })
+                .then((data) => displayWeather(data))
+                .catch(error => {
+                    console.error("Error fetching weather data:", error);
+                });
+        }
+
+        function displayWeather(data) {
+            weather.name = data.name;
+            weather.icon = data.weather[0].icon;
+            weather.description = data.weather[0].description;
+            weather.temp = data.main.temp;
+            weather.humidity = data.main.humidity;
+            weather.speed = data.wind.speed;
+
+            cityElement.innerText = "天気 " + weather.name;
+            iconElement.src = "https://openweathermap.org/img/wn/" + weather.icon + ".png";
+            descriptionElement.innerText = weather.description;
+            temperatureElement.innerText = weather.temp + "°C";
+            humidityElement.innerText = "湿度:" + weather.humidity + "%";
+            windElement.innerText = "風速： " + weather.speed + " km/h";
+            weatherElement.classList.remove("loading");
+            document.body.style.backgroundImage = "url('https://source.unsplash.com/1600x900/?" + weather.name + "')";
+        }
+
+        function searchCity() {
+            const cityName = searchInputText.value.trim();
+            getWeather(cityName);
+        }
+
+        const searchOnClick = document.querySelector(".search button");
+        const searchOnEnter = document.querySelector(".search-bar");
+
+        searchOnClick.addEventListener("click", (event) => searchCity());
+
+        searchOnEnter.addEventListener("keyup", (event) => {
+            if (event.key == "Enter") searchCity();
+        });
+
+        function displayForecast(data) {
+            // Display tomorrow's forecast
+            const tomorrow = data.list.find((item) => {
+                const date = new Date(item.dt * 1000); // Convert timestamp to milliseconds
+                const tomorrowDate = new Date();
+                tomorrowDate.setDate(tomorrowDate.getDate() + 1); // Get date for tomorrow
+                return date.getDate() === tomorrowDate.getDate(); // Compare only dates
+            });
+        }
+
+        function displayWeather(data) {
+            weather.name = data.name;
+            weather.icon = data.weather[0].icon;
+            weather.description = getSimpleDescription(data.weather[0].main); // Simplified description
+            weather.temp = data.main.temp;
+            weather.humidity = data.main.humidity;
+            weather.speed = data.wind.speed;
+
+            // Display weather information
+            cityElement.innerText = "Weather in " + weather.name;
+            iconElement.src = "https://openweathermap.org/img/wn/" + weather.icon + ".png";
+            descriptionElement.innerText = weather.description;
+            temperatureElement.innerText = weather.temp + "°C";
+            humidityElement.innerText = "湿度: " + weather.humidity + "%";
+            windElement.innerText = "風速:" + weather.speed + " km/h";
+            weatherElement.classList.remove("loading");
+            document.body.style.backgroundImage = "url('https://source.unsplash.com/1600x900/?" + weather.name + "')";
+        }
+
+        // Function to simplify weather description
+        function getSimpleDescription(weatherMain) {
+            switch (weatherMain) {
+                case "Thunderstorm":
+                    return "Thunderstorm";
+                case "Drizzle":
+                    return "Drizzle";
+                case "Rain":
+                    return "Rain";
+                case "Snow":
+                    return "Snow";
+                case "Atmosphere":
+                    return "Atmosphere";
+                case "Clear":
+                    return "Clear sky";
+                case "Clouds":
+                    return "Cloudy";
+                default:
+                    return "Unknown";
+            }
+        }
+
+
+        // Call the function to display today's weather and tomorrow's forecast
+        getForecastByLocation(latitude, longitude);
+
+
+    </script>
+</body>
+
+</html>
