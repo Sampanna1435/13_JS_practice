@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -19,15 +19,19 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: gray;
             font-family: 'Raleway', sans-serif;
             font-size: 120%;
             opacity: 0.8;
-            background-image: url('https://source.unsplash.com/1600x900/?landscape');
-            background-size: 100% auto;
+            background-image: url('./pngtree-hand-drawn-blue-sky-white-clouds-weather-forecast-illustration-background-image_270899.jpg');
+            background-size: cover;
+            background-position: center;
             background-repeat: no-repeat;
+            background-attachment: fixed;
+            /* Ensures background covers the whole viewport */
             color: white;
         }
+
+
 
         .content {
             background: black;
@@ -118,8 +122,6 @@
                 background-size: cover;
                 height: auto;
                 padding: 1em;
-                background-image: url('https://source.unsplash.com/1600x900/?landscape');
-                background-size: 400% auto;
             }
 
             .content {
@@ -153,10 +155,10 @@
             <h1 class="temperature">31°C</h1>
             <div class="flex">
                 <img src="https://openweathermap.org/img/wn/04n.png" alt="" class="icon" />
-                <div class="description"></div>
+                <div class="description">曇り</div>
             </div>
-            <div class="humidity"></div>
-            <div class="wind"></div>
+            <div class="humidity">湿度: 60%</div>
+            <div class="wind">風速: 1.2 km/h</div>
         </div>
         <div class="forecast" id="tomorrow-forecast">
             <h2>明日の天気</h2>
@@ -169,46 +171,43 @@
     </div>
 
     <script>
-        const cityElement = document.querySelector(".city");
-        const iconElement = document.querySelector(".icon");
-        const descriptionElement = document.querySelector(".description");
-        const temperatureElement = document.querySelector(".temperature");
-        const humidityElement = document.querySelector(".humidity");
-        const windElement = document.querySelector(".wind");
-        const weatherElement = document.querySelector(".weather");
-        const searchInputText = document.getElementById("search-input");
-        const forecastElements = document.querySelectorAll(".forecast");
+        const cityElement = document.querySelector(".city")
+        const iconElement = document.querySelector(".icon")
+        const descriptionElement = document.querySelector(".description")
+        const temperatureElement = document.querySelector(".temperature")
+        const humidityElement = document.querySelector(".humidity")
+        const windElement = document.querySelector(".wind")
+        const weatherElement = document.querySelector(".weather")
+        const searchInputText = document.getElementById("search-input")
+        const forecastElements = document.querySelectorAll(".forecast")
 
-        const weather = {};
-        const apiKey = "58782a0db956cc6008e9fce3c0fce3a4";
+        const weather = {}
+        const apiKey = "58782a0db956cc6008e9fce3c0fce3a4"
 
         if ('geolocation' in navigator) {
-            navigator.geolocation.getCurrentPosition(findUserLocation);
+            navigator.geolocation.getCurrentPosition(findUserLocation)
         }
 
         function findUserLocation(position) {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
+            let latitude = position.coords.latitude;
+            let longitude = position.coords.longitude;
             getWeatherByLocation(latitude, longitude);
         }
 
         function getWeatherByLocation(latitude, longitude) {
-            const userLocationApi = "https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&units=metric&appid=" + apiKey;
-            const forecastApi = "https://api.openweathermap.org/data/2.5/forecast?lat=" + latitude + "&lon=" + longitude + "&units=metric&appid=" + apiKey;
-
-            Promise.all([
-                fetch(userLocationApi).then(response => response.json()),
-                fetch(forecastApi).then(response => response.json())
-            ]).then(([weatherData, forecastData]) => {
-                displayWeather(weatherData);
-                displayForecast(forecastData);
-            }).catch(error => {
-                console.error("Error fetching weather data:", error);
-            });
+            let userLocationApi = "http://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&units=metric&appid=" + apiKey;
+            fetch(userLocationApi)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((data) => {
+                    displayWeather(data);
+                    getForecastByLocation(latitude, longitude);
+                });
         }
 
         function getWeather(city) {
-            const byCityApi = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&appid=" + apiKey;
+            let byCityApi = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&appid=" + apiKey;
             fetch(byCityApi)
                 .then((response) => {
                     if (response.ok) {
@@ -216,19 +215,17 @@
                     }
                     alert("Sorry, no weather is found");
                 })
-                .then((data) => displayWeather(data))
-                .catch(error => {
-                    console.error("Error fetching weather data:", error);
-                });
+                .then((data) => displayWeather(data));
         }
 
         function displayWeather(data) {
             weather.name = data.name;
             weather.icon = data.weather[0].icon;
-            weather.description = data.weather[0].description;
+            weather.description = data.weather[0].description
             weather.temp = data.main.temp;
             weather.humidity = data.main.humidity;
             weather.speed = data.wind.speed;
+            console.log(weather.name, weather.icon, weather.description, weather.temp, weather.humidity, weather.speed)
 
             cityElement.innerText = "天気 " + weather.name;
             iconElement.src = "https://openweathermap.org/img/wn/" + weather.icon + ".png";
@@ -237,78 +234,87 @@
             humidityElement.innerText = "湿度:" + weather.humidity + "%";
             windElement.innerText = "風速： " + weather.speed + " km/h";
             weatherElement.classList.remove("loading");
-            document.body.style.backgroundImage = "url('https://source.unsplash.com/1600x900/?" + weather.name + "')";
+            document.body.style.backgroundImage =
+                weather.name + "')";
         }
 
         function searchCity() {
-            const cityName = searchInputText.value.trim();
-            getWeather(cityName);
+            const cityName = searchInputText.value.trim()
+            getWeather(cityName)
         }
 
-        const searchOnClick = document.querySelector(".search button");
-        const searchOnEnter = document.querySelector(".search-bar");
+        const searchOnClick = document.querySelector(".search button")
+        const searchOnEnter = document.querySelector(".search-bar")
 
         searchOnClick.addEventListener("click", (event) => searchCity());
 
         searchOnEnter.addEventListener("keyup", (event) => {
-            if (event.key == "Enter") searchCity();
+            if (event.key == "Enter")
+                searchCity()
         });
 
-        function displayForecast(data) {
-            // Display tomorrow's forecast
+        function getForecastByLocation(latitude, longitude) {
+            let forecastApi = "https://api.openweathermap.org/data/2.5/forecast?lat=" + latitude + "&lon=" + longitude + "&units=metric&appid=" + apiKey;
+            fetch(forecastApi)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((data) => {
+                    displayForecast(data);
+                });
+        }
+
+        const tomorrowForecastElement = document.getElementById("tomorrow-forecast");
+
+        function getForecastByLocation(latitude, longitude) {
+            let forecastApi = "https://api.openweathermap.org/data/2.5/forecast?lat=" + latitude + "&lon=" + longitude + "&units=metric&appid=" + apiKey;
+            fetch(forecastApi)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((data) => {
+                    displayTomorrowForecast(data);
+                });
+        }
+
+        function displayTomorrowForecast(data) {
             const tomorrow = data.list.find((item) => {
                 const date = new Date(item.dt * 1000); // Convert timestamp to milliseconds
                 const tomorrowDate = new Date();
                 tomorrowDate.setDate(tomorrowDate.getDate() + 1); // Get date for tomorrow
                 return date.getDate() === tomorrowDate.getDate(); // Compare only dates
             });
+
+            tomorrowForecastElement.querySelector(".forecast-temp").innerText = tomorrow.main.temp + "°C";
+            tomorrowForecastElement.querySelector(".forecast-description").innerText = getWeatherDescription(tomorrow);
+            tomorrowForecastElement.querySelector(".forecast-icon").src = "https://openweathermap.org/img/wn/" + tomorrow.weather[0].icon + ".png";
         }
 
-        function displayWeather(data) {
-            weather.name = data.name;
-            weather.icon = data.weather[0].icon;
-            weather.description = getSimpleDescription(data.weather[0].main); // Simplified description
-            weather.temp = data.main.temp;
-            weather.humidity = data.main.humidity;
-            weather.speed = data.wind.speed;
-
-            // Display weather information
-            cityElement.innerText = "Weather in " + weather.name;
-            iconElement.src = "https://openweathermap.org/img/wn/" + weather.icon + ".png";
-            descriptionElement.innerText = weather.description;
-            temperatureElement.innerText = weather.temp + "°C";
-            humidityElement.innerText = "湿度: " + weather.humidity + "%";
-            windElement.innerText = "風速:" + weather.speed + " km/h";
-            weatherElement.classList.remove("loading");
-            document.body.style.backgroundImage = "url('https://source.unsplash.com/1600x900/?" + weather.name + "')";
-        }
-
-        // Function to simplify weather description
-        function getSimpleDescription(weatherMain) {
-            switch (weatherMain) {
-                case "Thunderstorm":
-                    return "Thunderstorm";
-                case "Drizzle":
-                    return "Drizzle";
-                case "Rain":
-                    return "Rain";
-                case "Snow":
-                    return "Snow";
-                case "Atmosphere":
-                    return "Atmosphere";
-                case "Clear":
-                    return "Clear sky";
-                case "Clouds":
-                    return "Cloudy";
-                default:
-                    return "Unknown";
+        function getWeatherDescription(weatherData) {
+            const weatherId = weatherData.weather[0].id;
+            if (weatherId >= 200 && weatherId < 300) {
+                return "Thunderstorm";
+            } else if (weatherId >= 300 && weatherId < 400) {
+                return "Drizzle";
+            } else if (weatherId >= 500 && weatherId < 600) {
+                return "Rain";
+            } else if (weatherId >= 600 && weatherId < 700) {
+                return "Snow";
+            } else if (weatherId >= 700 && weatherId < 800) {
+                return "Atmosphere";
+            } else if (weatherId === 800) {
+                return "Clear sky";
+            } else if (weatherId === 801) {
+                return "Few clouds";
+            } else if (weatherId === 802 || weatherId === 803 || weatherId === 804) {
+                return "Cloudy";
+            } else {
+                return "Unknown";
             }
         }
 
-
-        // Call the function to display today's weather and tomorrow's forecast
+        // Call the function to display tomorrow's forecast
         getForecastByLocation(latitude, longitude);
-
 
     </script>
 </body>
