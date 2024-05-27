@@ -195,7 +195,7 @@
         }
 
         function getWeatherByLocation(latitude, longitude) {
-            let userLocationApi = "http://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&units=metric&appid=" + apiKey;
+            let userLocationApi = "https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&units=metric&appid=" + apiKey;
             fetch(userLocationApi)
                 .then((response) => {
                     return response.json();
@@ -207,7 +207,7 @@
         }
 
         function getWeather(city) {
-            let byCityApi = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&appid=" + apiKey;
+            let byCityApi = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&appid=" + apiKey;
             fetch(byCityApi)
                 .then((response) => {
                     if (response.ok) {
@@ -312,9 +312,6 @@
                 return "Unknown";
             }
         }
-
-        // Call the function to display tomorrow's forecast
-        getForecastByLocation(latitude, longitude);
 
     </script>
 </body>
