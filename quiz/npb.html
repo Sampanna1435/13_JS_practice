@@ -88,6 +88,18 @@
                 teamArea.insertAdjacentElement("beforeend", ulElm);
             })
         }
+
+
+        // 問題2
+        resultBtn.addEventListener("click", function () {
+            const ulElm = document.createElement("ul");
+            for (const key in kingdom) {
+                const liElm = document.createElement("li");
+                liElm.textContent = `${key}: ${kingdom[key]}`;
+                ulElm.appendChild(liElm);
+            }
+            document.querySelector(".data").appendChild(ulElm);
+        });
     </script>
 
 </body>
